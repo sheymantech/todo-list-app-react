@@ -17,27 +17,35 @@ export default function App() {
 
   const [name, setName] = useState("");
 
-  function handleEdit(id) {
-    setEdit(!edit);
-    setName(name);
-    setTodoList((todos) =>
-      todos.map((todo, newName) =>
-        todo.id === id ? { ...todo, name: newName } : todo
-      )
-    );
-  }
-
   function handleSubmit() {
     const id = crypto.randomUUID();
     const newTodo = {
       id,
       name,
     };
+
+    // if (edit) {
+    //   setTodoList((todos) =>
+    //     todos.map((todo) =>
+    //       todo.id === idd ? { ...todo, name: newName } : todo
+    //     )
+    //   );
+    // }
+
     setTodoList((todo) => [...todo, newTodo]);
     setName("");
   }
   function handleDelete(id) {
     setTodoList((todos) => todos.filter((todo) => todo.id !== id));
+  }
+
+  function handleEdit(id) {
+    setEdit(!edit);
+    if (edit) {
+      setTodoList((todos) =>
+        todos.map((todo) => (todo.id === id ? { ...todo, name: name } : todo))
+      );
+    }
   }
   return (
     <div className="container">
@@ -57,6 +65,7 @@ export default function App() {
                 onEdit={handleEdit}
                 todoList={todoList}
                 onDelete={handleDelete}
+                name={name}
               />
               <ClearItem />
             </div>
@@ -92,22 +101,27 @@ function FormSubmit({ onHandleSubmit, name, setName, edit }) {
     </form>
   );
 }
-function TodoList({ todoList, onEdit, onDelete }) {
+function TodoList({ todoList, onEdit, onDelete, name }) {
   return (
     <>
       {todoList.map((todo) => (
-        <Todo todo={todo} onEdit={onEdit} key={todo.id} onDelete={onDelete} />
+        <Todo
+          todo={todo}
+          onEdit={onEdit}
+          key={todo.id}
+          onDelete={onDelete}
+          name={name}
+        />
       ))}
     </>
   );
 }
-function Todo({ todo, onEdit, onDelete }) {
-  const [newName, setNewName] = useState(todo.name);
+function Todo({ todo, onEdit, onDelete, name }) {
   return (
     <div className="items">
       <p>{todo.name}</p>
       <div className="btn-edit-wrapper">
-        <button className="edit" onClick={() => onEdit(todo.id, newName)}>
+        <button className="edit" onClick={() => onEdit(todo.id)}>
           <i className="bi bi-pencil-square"></i>
         </button>
         <button className="delete" onClick={() => onDelete(todo.id)}>
