@@ -7,6 +7,8 @@ export default function App() {
   const [added, setadded] = useState(false);
   const [message, setMessage] = useState(false);
   const [name, setName] = useState("");
+  const [editedTodoId, setEditedTodoId] = useState(null);
+  const [editedTodoName, setEditedTodoName] = useState("");
 
   function handleSubmit() {
     const id = crypto.randomUUID();
@@ -15,20 +17,13 @@ export default function App() {
       name,
     };
 
-    // if (edit) {
-    //   setTodoList((todos) =>
-    //     todos.map((todo) =>
-    //       todo.id === idd ? { ...todo, name: newName } : todo
-    //     )
-    //   );
-    // }
-
     setTodoList((todo) => [...todo, newTodo]);
     setName("");
     setDelete(false);
     setEdit(false);
     setadded(!added);
   }
+
   function handleDelete(id) {
     setTodoList((todos) => todos.filter((todo) => todo.id !== id));
     setadded(false);
@@ -38,19 +33,28 @@ export default function App() {
   }
 
   function handleEdit(id) {
+    if (edit === false) {
+      setEdit(!edit);
+      console.log("sheyman");
+      return;
+    }
+
     if (edit) {
       setTodoList((todos) =>
-        todos.map((todo) => (todo.id === id ? { ...todo, name: name } : todo))
+        todos.map((todo) => (todo.id === id ? { ...todo, name } : todo))
       );
       setDelete(false);
       setadded(false);
-      setEdit(!edit);
+      setEdit(true);
+      displayMessage();
     }
-    setDelete(false);
-    setadded(false);
     setEdit(!edit);
-    displayMessage();
   }
+  // setDelete(false);
+  // setadded(false);
+  // setEdit(!edit);
+  // displayMessage();
+
   function displayMessage() {
     setMessage(true);
     setTimeout(function () {
@@ -64,6 +68,10 @@ export default function App() {
     setadded(false);
     displayMessage();
   }
+  // function handleActivateEdit() {
+  //   setName(name);
+  //   setEdit(!edit);
+  // }
   return (
     <div className="container">
       <div className="row main">
@@ -83,7 +91,6 @@ export default function App() {
               onHandleSubmit={handleSubmit}
               name={name}
               setName={setName}
-              edit={edit}
               displayMessage={displayMessage}
             />
             <div className="grocery-list">
@@ -101,11 +108,12 @@ export default function App() {
     </div>
   );
 }
+
 function Header() {
   return <h3>Grocery Bud</h3>;
 }
 
-function FormSubmit({ onHandleSubmit, name, setName, edit, displayMessage }) {
+function FormSubmit({ onHandleSubmit, name, setName, displayMessage }) {
   function handleSubmit(e) {
     e.preventDefault();
     onHandleSubmit();
@@ -121,7 +129,7 @@ function FormSubmit({ onHandleSubmit, name, setName, edit, displayMessage }) {
         placeholder="e.g eggs"
       />
       <button type="submit" className="submit-btn">
-        {edit ? "Edit" : "Submit"}
+        submit
       </button>
     </form>
   );
@@ -141,7 +149,7 @@ function TodoList({ todoList, onEdit, onDelete, name }) {
     </>
   );
 }
-function Todo({ todo, onEdit, onDelete, name }) {
+function Todo({ todo, onEdit, onDelete }) {
   return (
     <div className="items">
       <p>{todo.name}</p>
@@ -158,12 +166,14 @@ function Todo({ todo, onEdit, onDelete, name }) {
 }
 function ClearItem({ todoList, onClear }) {
   return (
-    <button
-      className={` ${todoList.length === 0 ? "hidden" : ""}`}
-      onClick={onClear}
-      id="btn"
-    >
-      clear items
-    </button>
+    <>
+      <button
+        className={` ${todoList.length === 0 ? "hidden" : ""}`}
+        onClick={onClear}
+        id="btn"
+      >
+        clear items
+      </button>
+    </>
   );
 }

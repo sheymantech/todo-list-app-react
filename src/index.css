@@ -72,6 +72,14 @@ input {
   letter-spacing: 3px;
   font-weight: 500;
 }
+#btn-success {
+  border: none;
+  background-color: transparent;
+  color: hsl(125, 49%, 72%);
+  letter-spacing: 3px;
+  font-weight: 500;
+  margin-left: 2rem;
+}
 .btn-edit-wrapper button {
   border: none;
 }
