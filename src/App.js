@@ -1,20 +1,11 @@
 import { useState } from "react";
 
 export default function App() {
-  const initialTodo = [
-    {
-      name: "rice",
-      id: crypto.randomUUID(),
-    },
-    {
-      name: "rice",
-      id: crypto.randomUUID(),
-    },
-  ];
-
-  const [todoList, setTodoList] = useState(initialTodo);
+  const [todoList, setTodoList] = useState([]);
   const [edit, setEdit] = useState(false);
-
+  const [deleteItem, setDelete] = useState(false);
+  const [added, setadded] = useState(false);
+  const [message, setMessage] = useState(false);
   const [name, setName] = useState("");
 
   function handleSubmit() {
@@ -34,24 +25,58 @@ export default function App() {
 
     setTodoList((todo) => [...todo, newTodo]);
     setName("");
+    setDelete(false);
+    setEdit(false);
+    setadded(!added);
   }
   function handleDelete(id) {
     setTodoList((todos) => todos.filter((todo) => todo.id !== id));
+    setadded(false);
+    setEdit(false);
+    setDelete(!deleteItem);
+    displayMessage();
   }
 
   function handleEdit(id) {
-    setEdit(!edit);
     if (edit) {
       setTodoList((todos) =>
         todos.map((todo) => (todo.id === id ? { ...todo, name: name } : todo))
       );
+      setDelete(false);
+      setadded(false);
+      setEdit(!edit);
     }
+    setDelete(false);
+    setadded(false);
+    setEdit(!edit);
+    displayMessage();
+  }
+  function displayMessage() {
+    setMessage(true);
+    setTimeout(function () {
+      setMessage(false);
+    }, 1500);
+  }
+  function clearAll() {
+    setTodoList([]);
+    setDelete(true);
+    setEdit(false);
+    setadded(false);
+    displayMessage();
   }
   return (
     <div className="container">
       <div className="row main">
         <div className="col-lg-4 col-sm-8 text-center main-cont">
-          <Message />
+          {message ? (
+            <span className={deleteItem ? "danger" : "success"}>
+              item {`${deleteItem ? "deleted" : ""}`}
+              {`${edit ? "edited" : ""}`}
+              {`${added ? "added" : ""}`} sucessfully
+            </span>
+          ) : (
+            ""
+          )}
           <Header />
           <div className="grocery-item">
             <FormSubmit
@@ -59,6 +84,7 @@ export default function App() {
               name={name}
               setName={setName}
               edit={edit}
+              displayMessage={displayMessage}
             />
             <div className="grocery-list">
               <TodoList
@@ -67,7 +93,7 @@ export default function App() {
                 onDelete={handleDelete}
                 name={name}
               />
-              <ClearItem />
+              <ClearItem todoList={todoList} onClear={clearAll} />
             </div>
           </div>
         </div>
@@ -78,13 +104,12 @@ export default function App() {
 function Header() {
   return <h3>Grocery Bud</h3>;
 }
-function Message() {
-  return <span className="success">item added sucessfully</span>;
-}
-function FormSubmit({ onHandleSubmit, name, setName, edit }) {
+
+function FormSubmit({ onHandleSubmit, name, setName, edit, displayMessage }) {
   function handleSubmit(e) {
     e.preventDefault();
     onHandleSubmit();
+    displayMessage();
   }
   return (
     <form onSubmit={handleSubmit}>
@@ -131,9 +156,13 @@ function Todo({ todo, onEdit, onDelete, name }) {
     </div>
   );
 }
-function ClearItem() {
+function ClearItem({ todoList, onClear }) {
   return (
-    <button className="clear-item " id="btn">
+    <button
+      className={` ${todoList.length === 0 ? "hidden" : ""}`}
+      onClick={onClear}
+      id="btn"
+    >
       clear items
     </button>
   );
